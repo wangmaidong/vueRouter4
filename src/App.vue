@@ -1,11 +1,28 @@
 <script setup></script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <div class="nav">
+    <router-link to="/home">首页</router-link>
+    <span class="span">|</span>
+    <router-link to="/about">关于</router-link>
+  </div>
+  <div class="content">
+    <router-view></router-view>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.span {
+  margin: 0 20px;
+}
+.content {
+  padding-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+</style>
