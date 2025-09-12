@@ -1,2 +1,2 @@
 export * from './history.js'
-export * from './createRouter.jsx'
+export * from './createRouter.js'
