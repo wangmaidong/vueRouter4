@@ -1,11 +1,13 @@
-import { shallowRef } from "vue"
+import { RouterLink } from './router-link.js'
+import { RouterView } from './router-view.js'
+import { computed, reactive, shallowRef } from "vue"
 
 function normalize(record) {
   return {
     path: record.path,
     name: record.name,
     meta: record.meta || {},
-    component: {
+    components: {
       default: record.component
     },
     children: record.children || [],
@@ -43,15 +45,20 @@ function createRouterMatcher(routes) {
     }
   }
   function resolve(path) {
+    debugger
     let matched = []
     // 根据传入的路径匹配
     let matcher = matchers.find(matcher => matcher.path == path)
     // 如果存在
     while(matcher) {
-      matched.unshift(matcher)
+      matched.unshift(matcher.record)
       matcher = matcher.parent
     }
-    return matched
+    console.log('matched', matched)
+    return {
+      path,
+      matched
+    }
   }
   routes.forEach(route => addRoute(route))
   console.log(matchers)
@@ -74,7 +81,7 @@ export function createRouter({ history, routes }) {
   function markReady() {
     if(ready) return
     ready = true
-    history.liston((to, from) => {
+    history.listen((to, from) => {
       to = matcher.resolve(to)
       from = currentLocation.value
       finalNavigation(to, from)
@@ -86,6 +93,7 @@ export function createRouter({ history, routes }) {
     } else {
       history.push(to.path)
     }
+    currentLocation.value = to
     markReady()
   }
   function pushWithRedirect(to) {
@@ -94,25 +102,23 @@ export function createRouter({ history, routes }) {
     finalNavigation(to ,from)
   }
   function push(to) {
-    return pushWithRedirect(to.value)
+    return pushWithRedirect(to.value || to)
   }
   if(currentLocation.value === START_LOCATION) {
     push(history.location)
   }
   const router = {
+    push,
     install(app) {
+      let reactiveObj = {}
+      for(let key in START_LOCATION) {
+        reactiveObj[key] = computed(() => currentLocation.value[key])
+      }
+      app.provide('location', reactive(reactiveObj))
+      app.provide('router', router)
       // 注册两个组件
-      app.component("RouterLink", {
-        render: (proxy) => {
-          let { $slots } = proxy;
-          return <div>{$slots.default()}</div>;
-        },
-      });
-      app.component("RouterView", {
-        render: (proxy) => {
-          return <div></div>
-        }
-      })
+      app.component("RouterLink", RouterLink);
+      app.component("RouterView", RouterView)
     },
   };
   return router;

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from '@/vue-router'
 import Home from '@/Home.vue'
 import About from '@/About.vue'
-import MyView from '@/Myview.vue'
+import MyView from '@/MyView.vue'
 import A from '@/A.vue'
 import B from '@/B.vue'
 let routes = [
@@ -11,7 +11,7 @@ let routes = [
     component: Home
   },
   {
-    path: '/About',
+    path: '/about',
     name: 'about',
     component: About
   },
